@@ -31,7 +31,16 @@ These skills are independent of any specific mod project and can be universally 
 | `hoi4-unit-design-creator` | Assist in creating division and ship designs. |
 | `hoi4-variable-helper` | Build logic for variable and array operations. |
 
+## Reference Documentation (`docs/`)
+
+In addition to Skills, this package includes a collection of general-purpose HOI4 modding reference materials in the `docs/` folder. These files can be read by AI agents to dramatically improve coding precision.
+- **`00_character/`**: Detailed guide for the leader and character system.
+- **`00_coding_contexts/`**: Coding contexts, optimization guides, variable usage, and console command summaries.
+- **`01_effects/`**, **`02_scopes/`**, **`04_triggers/`**: Structured `.json` databases of HOI4 scopes, triggers, and effects.
+- **`gitflow.md`**: Guide for GitFlow branch strategy.
+
 ## Usage
+
 
 ### Importing Skills to AI Agents
 

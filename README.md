@@ -1,61 +1,63 @@
 # Hearts of Iron IV Modding AI Agent Skills
 
-このパッケージは、Hearts of Iron IV (HOI4) のMOD開発を支援するために設計された、AIエージェント（Claude Code 等）向けの汎用スキル集です。
-特定のMODプロジェクト（SSW等）に依存せず、すべてのHOI4 MOD開発で汎用的に利用できるスキルがまとめられています。
+This package is a collection of general-purpose AI agent skills (Skills) designed to assist in Hearts of Iron IV (HOI4) mod development.
+These skills are independent of any specific mod project and can be universally used for any HOI4 modding work.
 
-## 収録スキル一覧 (全21種)
+[日本語のドキュメントはこちら (Japanese Documentation)](README_ja.md)
 
-| スキル名 | 説明 |
+## Included Skills (21 Skills Total)
+
+| Skill Name | Description |
 | :--- | :--- |
-| `hoi4-decisions-helper` | ディシジョンの作成と管理の対話的支援 |
-| `hoi4-decisions-searcher` | 既存のディシジョンの検索・参照 |
-| `hoi4-event-helper` | イベント（country_event, news_event等）の対話的作成とローカライズ作成 |
-| `hoi4-event-searcher` | 既存のイベント定義の検索・参照 |
-| `hoi4-focus-searcher` | 国家方針（National Focus）の検索 |
-| `hoi4-gfx-searcher` | GFX定義や画像アセットパスの検索 |
-| `hoi4-gui` | Scripted GUIおよびインターフェース（.gui）ファイルの作成・最適化支援 |
-| `hoi4-idea-creator` | 国民精神（Ideas）の構造化定義と作成 |
-| `hoi4-image-asset-creator` | 画像アセット（TGA/DDS等）の生成、調整、適用支援 |
-| `hoi4-modifier-maker` | 補正（Modifiers/Dynamic Modifiers）ブロックの対話的作成 |
-| `hoi4-modifier-searcher` | 利用可能な補正の検索・参照 |
-| `hoi4-nf-creator` | 国家方針（National Focus）ツリーおよび個別フォーカスの作成 |
-| `hoi4-on-actions-helper` | `on_actions` 定義とイベントトリガーの構成支援 |
-| `hoi4-opinion-modifiers-helper` | 外交関係・評価補正（Opinion Modifiers）の作成・管理 |
-| `hoi4-scripted-effect-maker` | スクリプト効果（Scripted Effects）の定義・作成 |
-| `hoi4-scripted-effect-searcher` | 既存のスクリプト効果の検索 |
-| `hoi4-scripted-localisation-helper` | スクリプト化されたローカライズの作成・統合 |
-| `hoi4-scripted-triggers-helper` | スクリプトトリガー（Scripted Triggers）の定義・作成 |
-| `hoi4-techtree-creator` | 技術ツリー（Tech Tree）の構成と定義の作成 |
-| `hoi4-unit-design-creator` | 師団・艦船設計（Unit/Ship Design）の作成支援 |
-| `hoi4-variable-helper` | 変数（Variables）や配列（Arrays）操作のロジック構築支援 |
+| `hoi4-decisions-helper` | Interactive assistance for creating and managing decisions. |
+| `hoi4-decisions-searcher` | Search and reference existing decision definitions. |
+| `hoi4-event-helper` | Interactive creation of events (country_event, news_event, etc.) and localization. |
+| `hoi4-event-searcher` | Search and reference existing event definitions. |
+| `hoi4-focus-searcher` | Search national focus definitions. |
+| `hoi4-gfx-searcher` | Search GFX definitions and image asset paths. |
+| `hoi4-gui` | Build and optimize scripted GUIs and interface (.gui) files. |
+| `hoi4-idea-creator` | Create and structure national spirits (Ideas) and laws. |
+| `hoi4-image-asset-creator` | Help create, convert, and hook up image assets (TGA/DDS). |
+| `hoi4-modifier-maker` | Interactive creation of modifier blocks and dynamic modifiers. |
+| `hoi4-modifier-searcher` | Search and reference available modifiers. |
+| `hoi4-nf-creator` | Create national focus trees and individual focus definitions. |
+| `hoi4-on-actions-helper` | Configure `on_actions` and event triggers. |
+| `hoi4-opinion-modifiers-helper` | Create and manage diplomatic opinion modifiers. |
+| `hoi4-scripted-effect-maker` | Define and create scripted effects. |
+| `hoi4-scripted-effect-searcher` | Search existing scripted effects. |
+| `hoi4-scripted-localisation-helper` | Create and integrate scripted localization (defined text). |
+| `hoi4-scripted-triggers-helper` | Define and create scripted triggers. |
+| `hoi4-techtree-creator` | Define and structure technology trees. |
+| `hoi4-unit-design-creator` | Assist in creating division and ship designs. |
+| `hoi4-variable-helper` | Build logic for variable and array operations. |
 
-## 使用方法
+## Usage
 
-### AIエージェントへの導入方法
+### Importing Skills to AI Agents
 
-本スキル群は、AIエージェント（例：Claude Code等）に読み込ませて使用します。
+These skills are designed to be loaded by AI agents (e.g., Claude Code, Cursor, etc.).
 
-1. **`.skill` ファイルを配置する場合**
-   - 各スキルの `.skill` ファイルは、ZIP圧縮されたアーカイブ形式です。
-   - 使用するプロジェクト（MOD開発ディレクトリ）の直下に `.claude/skills/` ディレクトリを作成し、そこに使用したいスキルの `.skill` ファイル（例：`hoi4-event-helper.skill`）をコピーしてください。
+1. **Deploying as `.skill` files**
+   - Each skill's `.skill` file is a ZIP archive.
+   - Create a `.claude/skills/` directory at the root of your active mod development directory, and copy the desired `.skill` files (e.g., `hoi4-event-helper.skill`) into it.
 
-2. **ディレクトリとして配置する場合**
-   - `.skill` ファイルを展開したディレクトリ（または `skills/` 配下にある各スキルフォルダ）を直接 `.claude/skills/` 以下に配置しても動作します。
+2. **Deploying as directories**
+   - Alternatively, you can unpack the `.skill` files and place the skill folders directly under `.claude/skills/`.
 
-### スキルのパッケージング方法
+### Packaging Skills
 
-スキル内容を編集し、再度 `.skill` ファイル（zipアーカイブ）を生成する場合は、付属のスクリプトを使用します。
+If you edit the contents of a skill and need to rebuild the `.skill` zip archive, use the provided Python scripts.
 
-- **特定のスキルをパッケージングする場合:**
+- **To package a specific skill:**
   ```bash
-  python3 package_skill.py skills/<スキルフォルダ名>
+  python3 package_skill.py skills/<skill-directory-name>
   ```
-  （例：`python3 package_skill.py skills/hoi4-modifier-maker` を実行すると、`skills/hoi4-modifier-maker.skill` が生成されます）
+  *(Example: `python3 package_skill.py skills/hoi4-modifier-maker` will update `skills/hoi4-modifier-maker.skill`)*
 
-- **すべてのスキルを一括パッケージングする場合:**
+- **To package all skills at once:**
   ```bash
   python3 package_all.py
   ```
 
 ---
-本パッケージは配布用にまとめられたものです。MOD作成時のAIエージェントの作業精度向上にご活用ください。
+This package is structured for easy distribution. Good luck with your HOI4 modding!

@@ -1,23 +1,24 @@
 ---
 name: hoi4-variable-helper
-description: Comprehensive guide for HOI4 variables, arrays, collections, and script constants. Use when the user (1) Needs to manage variables or temporary values, (2) Wants to work with arrays/lists, (3) Asks about collections or filtering objects, (4) Needs to define reusable constants, or (5) Says phrases like "how to use variables", "create array", "define collection", "set up constants", etc. Covers all data management systems in HOI4 scripting.
+description: Comprehensive guide for HOI4 variables, temporary variables, math expressions, arrays, collections, MTTH variables, and script constants. Use when the user (1) Needs to manage variables or temporary values, (2) Wants formula-based variable effects or math expressions, (3) Wants to work with arrays/lists, (4) Asks about collections or filtering objects, (5) Needs to define reusable constants, or (6) Says phrases like "how to use variables", "create array", "define collection", "math expression", "数式", "set up constants", etc. Covers all data management systems in HOI4 scripting.
 ---
 
 # HOI4 Variable Helper
 
 ## Overview
 
-Comprehensive guide for managing data in HOI4 scripting: Variables (single values), Arrays (lists), Collections (filtered object groups), MTTH Variables (dynamic calculated values), and Script Constants (reusable definitions). Provides syntax, examples, and best practices for all data management systems.
+Comprehensive guide for managing data in HOI4 scripting: Variables (single values), Math Expressions (inline formulas), Arrays (lists), Collections (live filtered object groups), MTTH Variables (dynamic calculated values), and Script Constants (reusable definitions). Provides syntax, examples, and best practices for all data management systems.
 
 ## When This Skill Triggers
 
 This skill activates when:
 - User needs to store or manipulate values (variables)
+- User wants formula-based calculations without staging many temp variables
 - User wants to manage lists of countries/states/etc (arrays)
 - User needs to filter and group game objects (collections)
 - User wants to define reusable constants across scripts
 - User needs dynamic calculated values (MTTH variables)
-- User says: "how to use variables", "create array", "loop through countries", "define constants", "mtth variables"
+- User says: "how to use variables", "create array", "loop through countries", "define constants", "mtth variables", "math expressions", "数式"
 
 ## Quick Reference
 
@@ -26,6 +27,12 @@ This skill activates when:
 set_variable = { var_name = 10 }
 add_to_variable = { var_name = 5 }
 check_variable = { var_name > 15 }
+```
+
+### Math Expressions
+```
+set_variable = { mobile_ratio = { value = num_cavalry add = num_motorized divide = num_units } }
+add_to_temp_variable = { score = { value = factories multiply = 1.5 clamp = { min = 0 max = 100 } } }
 ```
 
 ### Arrays
@@ -38,9 +45,10 @@ for_each_loop = { array = my_array ... }
 
 ### Collections
 ```
-collection:my_collection
-game:all_countries
-country:faction_members
+game:all_countries           # input source: all countries
+collection:my_collection     # named custom collection
+collections:all_countries    # explicit collection namespace where the engine/docs require it
+constant:state_groups.balkans # constants can feed collections
 ```
 
 ### Script Constants
@@ -179,6 +187,79 @@ has_variable = var_name
 
 ```
 clear_variable = var_name
+```
+
+### Math Expressions in Variable Effects
+
+Use a math expression when a variable effect needs a formula. It is faster and clearer than staging several temporary variables for a single calculation. The expression starts with `value = ...`, then applies statements in order.
+
+Supported in normal and temp variable effects such as `set_variable`, `add_to_variable`, `subtract_from_variable`, `multiply_variable`, `divide_variable`, and their temp variants. Do not use expression blocks with `modulo_variable` or `clamp_variable`; keep their native block syntax.
+
+```
+set_variable = {
+    mobile_units = {
+        value = num_cavalry
+        add = num_motorized
+        add = num_mechanized
+    }
+}
+
+set_temp_variable = {
+    mobile_share = {
+        value = mobile_units
+        divide = num_units
+        clamp = { min = 0 max = 1 }
+    }
+}
+```
+
+Math expressions use fixed-point arithmetic. In expression logic, `0.0` is false and any nonzero value is true. Comparison operators return `1.0` for true and `0.0` for false. If parsing fails at runtime, the expression value becomes `0.0`, so keep formulas small enough to read and test.
+
+**Operators:**
+```
+multiply = x
+add = x
+subtract = x
+divide = x
+min = x
+max = x
+clamp = { min = 0 max = 100 }   # order matters
+greater_than = x
+less_than = x
+greater_than_or_equals = x
+less_than_or_equals = x
+equals = x
+not_equals = x
+round = yes
+```
+
+**Conditional formula:**
+```
+set_variable = {
+    policy_score = {
+        value = base_score
+        if = {
+            limit = { value = stability greater_than = 0.6 }
+            add = 10
+        }
+        else = {
+            subtract = 5
+        }
+    }
+}
+```
+
+**Collection iterator in a formula:**
+```
+set_variable = {
+    major_factory_total = {
+        value = 0
+        every_collection = {
+            named_collection = non_capitulated_majors
+            add = num_of_factories
+        }
+    }
+}
 ```
 
 ### Using Variables in Localization
@@ -425,7 +506,9 @@ for_loop_effect = {
 
 ## Part 3: Collections
 
-Collections are filtered groups of game objects (countries, states, etc).
+Collections are live, auto-updating groups of game objects (countries, states, characters, etc). They are an unordered, stylish alternative to arrays when the membership should be derived from game state instead of manually maintained. Use arrays when order or stable indices matter; use collections when "all matching objects right now" is the point.
+
+Collections must be referenced with explicit prefixes. Do not pass bare names like `all_countries` where a collection is expected. Definition inputs commonly use `game:`, `collection:`, and `constant:`; some newer call sites/docs use the explicit `collections:` namespace for built-ins such as `collections:all_countries`.
 
 ### Built-In Collections
 
@@ -436,6 +519,7 @@ game:all_countries           # All existing countries
 game:all_possible_countries  # All possible countries
 game:all_states              # All states
 game:scope                   # Current scope as collection
+collections:all_countries    # explicit collection namespace form where required
 ```
 
 **Country scope:**
@@ -448,7 +532,7 @@ country:faction_members      # All faction members
 **In effects:**
 ```
 every_collection_element = {
-    collection = game:all_countries
+    collection = collection:major_powers
     # Effects on each country
     add_stability = 0.05
 }
@@ -457,8 +541,24 @@ every_collection_element = {
 **Check size:**
 ```
 collection_size = {
-    collection = game:all_countries
+    collection = collection:major_powers
     value > 10
+}
+```
+
+**Inline/anonymous collection when no reuse is needed:**
+```
+every_collection_element = {
+    collection = {
+        input = game:all_countries
+        operators = {
+            limit = {
+                is_major = yes
+                has_capitulated = no
+            }
+        }
+    }
+    add_political_power = 25
 }
 ```
 
@@ -508,6 +608,44 @@ operators = {
     }
 }
 ```
+
+Collections can feed other collections and can mix with script constants:
+```
+non_capitulated_majors = {
+    input = game:all_countries
+    operators = {
+        limit = {
+            is_major = yes
+            has_capitulated = no
+        }
+    }
+    name = COLLECTION_NON_CAPITULATED_MAJORS
+}
+
+non_capitulated_majors_with_smaller_navy_than_HIP = {
+    input = collection:non_capitulated_majors
+    operators = {
+        limit = {
+            naval_strength_comparison = {
+                other = HIP
+                ratio < 1.0
+                sub_unit_def_weights = {
+                    carrier = 1.45
+                    battleship = 1.15
+                    battle_cruiser = 1
+                    heavy_cruiser = 0.85
+                    light_cruiser = 0.7
+                    destroyer = 0.55
+                    submarine = 0.3
+                }
+            }
+        }
+    }
+    name = COLLECTION_NON_CAPITULATED_MAJORS_WITH_SMALLER_NAVY_THAN_HIP
+}
+```
+
+Undocumented collection-related triggers observed in current builds: `count_in_collection` and `has_resources_in_collection`. Prefer searching vanilla/script logs for exact accepted block shape before using them in production content.
 
 ### Real Examples from SSW Mod
 
@@ -1385,6 +1523,7 @@ faction_controlled_mare_nostrum_states = {
 ### Variables
 - ✅ Variables are fast and efficient
 - ✅ Use temp variables for calculations that don't need saving
+- ✅ Use math expressions for one-shot formulas instead of chains of temp-variable effects
 - ⚠️ Global variables persist across saves
 - ⚠️ Clear unused variables to save memory
 
@@ -1463,6 +1602,7 @@ controllable_states = {
 
 For detailed syntax and examples:
 - `references/variables_guide.md` - Complete variable operations
+- `references/math_expressions.md` - Inline variable formulas, comparisons, conditionals, collection iterators
 - `references/arrays_guide.md` - Array manipulation and loops
 - `references/collections_guide.md` - Collection creation and usage
 - `references/constants_guide.md` - Script constants schema

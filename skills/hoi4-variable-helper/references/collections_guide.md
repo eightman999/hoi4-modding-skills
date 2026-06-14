@@ -2,7 +2,11 @@
 
 ## What Are Collections
 
-Collections are filtered groups of scopable objects (countries, states, characters, etc.).
+Collections are live, auto-updating groups of scopable objects (countries, states, characters, etc.). Treat them as unordered arrays whose membership is derived from inputs and operators at evaluation time.
+
+Use collections when membership is dynamic and order does not matter. Use arrays when order, stable indices, sorting, queues, or parallel fields matter.
+
+Always use an explicit prefix. Do not pass bare names like `all_countries`. Definition inputs commonly use `game:`, `collection:`, and `constant:`; some newer call sites/docs use `collections:` for built-in collection namespace references such as `collections:all_countries`.
 
 ## Built-In Collections
 
@@ -13,6 +17,7 @@ game:all_countries           # All existing countries
 game:all_possible_countries  # All possible countries (including formables)
 game:all_states              # All states in the game
 game:scope                   # Current scope as a collection
+collections:all_countries    # explicit collection namespace where required by call site/docs
 ```
 
 ### Country Scope
@@ -36,6 +41,23 @@ collection_name = {
     }
 
     name = LOCALIZATION_KEY  # Optional
+}
+```
+
+Collections can also be defined anonymously/inline when no other script needs the collection:
+
+```
+every_collection_element = {
+    collection = {
+        input = game:all_countries
+        operators = {
+            limit = {
+                is_major = yes
+                has_capitulated = no
+            }
+        }
+    }
+    add_political_power = 25
 }
 ```
 
@@ -128,6 +150,22 @@ every_collection_element = {
 collection_size = {
     collection = collection:democratic_countries
     value > 10
+}
+```
+
+Undocumented collection-related triggers observed in current builds: `count_in_collection` and `has_resources_in_collection`. Search vanilla usage or test in logs before relying on exact block syntax in production.
+
+### In Math Expressions
+
+```
+set_variable = {
+    major_factory_total = {
+        value = 0
+        every_collection = {
+            named_collection = non_capitulated_majors
+            add = num_of_factories
+        }
+    }
 }
 ```
 
